@@ -29,8 +29,119 @@ require File.expand_path(File.dirname(__FILE__) + '/neo')
 #
 # Your goal is to write the score method.
 
+def indivisual_score(dice, current_score)
+  dice.each do |die|
+    if die == 1
+      current_score += 100
+    end
+
+    if die == 5
+      current_score += 50
+    end
+  end
+
+  return current_score
+end
+
+def a_set_of_three_score(dice, current_score)
+  if dice.key?(1)
+    current_score += dice.keys[0] * 1000
+  else # A set of three numbers (other than ones)
+    current_score += dice.keys[0] * 100
+  end
+
+  return current_score
+end
+
+def the_same_set_num(hash, num)
+  hash.select {|key, item| item.count == num}
+end
+
 def score(dice)
-  # You need to write this method
+  # start of method 1
+  # ------------------------------------------------------------------------
+  # total_score = 0
+
+  # hash = dice.group_by {|ele| ele}
+  
+  # # the same: 5
+  # if !(the_same_set_num(hash, 5).empty?)
+  #   total_score = a_set_of_three_score(the_same_set_num(hash, 5), total_score)
+  #   total_score += indivisual_score(the_same_set_num(hash, 5).values[0], 0) * 2 / 5
+
+  #     return total_score
+  # end
+
+  # # the same: 4
+  # if !(the_same_set_num(hash, 4).empty?)
+  #   total_score += a_set_of_three_score(the_same_set_num(hash, 4), total_score)
+  #   if !(hash.select {|key, item| item.count != 4}.empty?)
+  #     total_score += indivisual_score(the_same_set_num(hash, 1).values[0], 0)
+  #   end
+  #     total_score += indivisual_score(the_same_set_num(hash, 4).values[0], 0) * 1 / 4
+  #   return total_score
+  # end
+
+  # # the same: 3
+  # if !(the_same_set_num(hash, 3).empty?)
+
+  #   total_score = a_set_of_three_score(the_same_set_num(hash, 3), total_score)
+
+  #   if !(hash.select {|key, item| item.count != 3}.empty?)
+  #     total_score = indivisual_score(hash.select {|key, item| item.count != 3}.values[0], total_score)
+  #   end
+
+  #   return total_score
+  # end
+  
+  # #the same: 2
+  # if !(the_same_set_num(hash, 2).empty?)
+  #   return indivisual_score(dice, total_score)
+  # end
+
+  # #the same: 1
+  # if !(the_same_set_num(hash, 1).empty?)
+  #   return indivisual_score(dice, total_score)
+  # end
+  
+  # return total_score
+  # end of start of method 1
+  # ---------------------------------------------------------
+
+  # start of method 2
+  # https://github.com/javierjulio/ruby-koans-completed/blob/master/about_scoring_project.rb
+  # ------------------------------------------------------------------------
+  
+
+  total_score = 0
+
+  each_dice = Hash.new {0}
+  dice.each {|ele| each_dice[ele] += 1}
+
+  each_dice.each do |element, numfound|
+    if (element == 1) && (numfound >= 3)
+      total_score += 1000
+      numfound -= 3
+    end
+
+    if numfound >= 3
+      total_score += 100 * element
+      numfound -= 3
+    end
+
+    if (element == 1) && (3 > numfound) && (numfound > 0)
+      total_score += 100 * numfound
+    end
+
+    if (element == 5) && (3 > numfound) && (numfound > 0)
+      total_score += 50 * numfound
+    end
+  end
+
+  total_score
+  # end of method 2
+  # ------------------------------------------------------------------------
+
 end
 
 class AboutScoringProject < Neo::Koan
@@ -68,7 +179,7 @@ class AboutScoringProject < Neo::Koan
 
   def test_score_of_mixed_is_sum
     assert_equal 250, score([2,5,2,2,3])
-    assert_equal 550, score([5,5,5,5])
+   assert_equal 550, score([5,5,5,5])
     assert_equal 1100, score([1,1,1,1])
     assert_equal 1200, score([1,1,1,1,1])
     assert_equal 1150, score([1,1,1,5,1])
